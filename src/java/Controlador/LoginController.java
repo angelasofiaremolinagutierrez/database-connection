@@ -25,28 +25,29 @@ import javax.inject.Named;
 public class LoginController implements Serializable{
 
     private Usuario user;
-    private List<Usuario> listaUsuarios;
+    private Usuario usuarioAutenticado=null;
     
     @EJB
     private UsuarioDAO ejbDao;
     
     public LoginController() {
+        user = new Usuario();
     }
     
     public void login() throws IOException{
-        
+        usuarioAutenticado = ejbDao.encontrarUsuarioPorLogin(user.getCorreo(), user.getClave());
         FacesContext context = FacesContext.getCurrentInstance();
         ExternalContext ex = context.getExternalContext();
-        ex.redirect("home");
         
-        user = null;
-        
-        for(Usuario u:listaUsuarios){
-            if(u.getCorreo().equals(user.getCorreo())&& u.getClave().equals(user.getClave())){
-                user = u;
-                break;
-            }
+        if (usuarioAutenticado==null) {
+            
+            ex.redirect("index");
         }
+        else{
+            ex.redirect("home");
+        }
+        
+        
     }
 
     
@@ -58,12 +59,20 @@ public class LoginController implements Serializable{
         this.user = user;
     }
 
-    public List<Usuario> getListaUsuarios() {
-        return listaUsuarios;
+    public Usuario getUsuarioAutenticado() {
+        return usuarioAutenticado;
     }
 
-    public void setListaUsuarios(List<Usuario> listaUsuarios) {
-        this.listaUsuarios = listaUsuarios;
+    public void setUsuarioAutenticado(Usuario usuarioAutenticado) {
+        this.usuarioAutenticado = usuarioAutenticado;
     }
-    
+
+    public UsuarioDAO getEjbDao() {
+        return ejbDao;
+    }
+
+    public void setEjbDao(UsuarioDAO ejbDao) {
+        this.ejbDao = ejbDao;
+    }
+
 }
