@@ -1,14 +1,14 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package DAO;
 
 import Modelos.Usuario;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 
 /**
@@ -18,7 +18,10 @@ import javax.persistence.Query;
 @Stateless
 public class UsuarioDAO {
     
-    @PersistenceContext(unitName = "databasePracticePU")
+    private final static Logger LOGGER = Logger.getLogger("UsuarioDAO");
+    
+    private EntityManagerFactory factory;
+    
     private EntityManager em;
     
     public void crear(Usuario entity){
@@ -38,11 +41,46 @@ public class UsuarioDAO {
     }
     
     public Usuario encontrarUsuarioPorLogin(String correo, String clave){
-        
-        
+        crearConexion();
         Query q = em.createQuery("SELECT u FROM Usuario u WHERE u.correo = :mail AND u.clave = :pass");
         q.setParameter("mail", correo);
         q.setParameter("pass", clave);
-        return (Usuario)q.getSingleResult(); //covertir object a Usuario
+        try{
+            return (Usuario)q.getSingleResult();//covertir object a Usuario
+        }catch(NoResultException e){
+            LOGGER.severe("ERROR AL CONSULTAR");
+            //cerrarConexion();
+            return null;
+        }finally{
+            LOGGER.severe("CONEXIÓN CERRADA");
+            cerrarConexion();
+        }
     }
+    
+    public void crearConexion(){
+        factory = Persistence.createEntityManagerFactory("databasePracticePU");
+        em = factory.createEntityManager();
+    }
+    
+    public void cerrarConexion(){
+        em.close();
+    }
+    
+    public List<Usuario> listar(){
+        
+        crearConexion();
+        Query q = em.createQuery("SELECT u FROM Usuario u");
+        
+        try{
+            return q.getResultList();
+        }catch(Exception e){
+            LOGGER.severe("ERROR AL CONSULTAR");
+            return null;
+        }finally{
+            LOGGER.severe("CONEXIÓN CERRADA");
+            cerrarConexion();
+        }
+    }
+    
+    
 }

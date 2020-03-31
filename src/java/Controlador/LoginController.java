@@ -10,11 +10,14 @@ import Modelos.Usuario;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
+
 
 /**
  *
@@ -26,6 +29,10 @@ public class LoginController implements Serializable{
 
     private Usuario user;
     private Usuario usuarioAutenticado=null;
+    
+    List<Usuario> listado;
+    
+    private final static Logger LOGGER = Logger.getLogger("controller.LoginController");
     
     @EJB
     private UsuarioDAO ejbDao;
@@ -40,16 +47,21 @@ public class LoginController implements Serializable{
         ExternalContext ex = context.getExternalContext();
         
         if (usuarioAutenticado==null) {
-            
-            ex.redirect("index");
+            LOGGER.log(Level.INFO, "NO ENCONTRADO");
+            ex.redirect("index.xhtml");
         }
         else{
-            ex.redirect("home");
+            LOGGER.log(Level.INFO, "BIENVENIDO");
+            ex.redirect("home.xhtml");
         }
         
         
     }
 
+    public List<Usuario> getListado(){
+        listado = ejbDao.listar();
+        return listado;
+    }
     
     public Usuario getUser() {
         return user;

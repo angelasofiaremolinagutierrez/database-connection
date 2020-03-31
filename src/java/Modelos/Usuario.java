@@ -34,7 +34,7 @@ public class Usuario implements Serializable {
     
     @Basic(optional = false)
     @NotNull
-    @Size(min = 8, max = 50)
+    @Size(min = 1, max = 50)
     private String clave;
     
     @Basic(optional=false)
