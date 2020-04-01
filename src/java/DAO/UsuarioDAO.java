@@ -8,6 +8,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
 
@@ -50,6 +51,9 @@ public class UsuarioDAO {
         }catch(NoResultException e){
             LOGGER.severe("ERROR AL CONSULTAR");
             //cerrarConexion();
+            return null;
+        }catch(NonUniqueResultException e){
+            LOGGER.severe("ERROR AL CONSULTAR. DUPLICADO");
             return null;
         }finally{
             LOGGER.severe("CONEXIÓN CERRADA");
